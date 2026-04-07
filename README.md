@@ -1,12 +1,12 @@
-# Project Charlie
+# Project DeepVein
 
-**Project Charlie** is a backend system for managing, organizing, and executing SQL queries across multiple database engines, extended with custom Python logic registered directly into [DuckDB](https://duckdb.org/).
+**Project DeepVein** is a backend system for managing, organizing, and executing SQL queries across multiple database engines, extended with custom Python logic registered directly into [DuckDB](https://duckdb.org/).
 
 This repository (**DeepVein**) is where the implementation lives. The project is in early development; APIs and layout will evolve as the roadmap below is implemented.
 
 ## Overview
 
-Charlie provides a single conceptual layer over heterogeneous databases: define connections once, register named queries and groups, run them in bulk or one at a time, and optionally enrich DuckDB with Python-defined functions (UDFs) for analytics and glue logic.
+DeepVein provides a single conceptual layer over heterogeneous databases: define connections once, register named queries and groups, run them in bulk or one at a time, and optionally enrich DuckDB with Python-defined functions (UDFs) for analytics and glue logic.
 
 ## Core features
 
