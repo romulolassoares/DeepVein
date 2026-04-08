@@ -3,10 +3,15 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import Engine, text
 from sqlalchemy.engine import create_engine
 
+from src.utils import config
+
+def _get_database_config() -> Dict[str, Any]:
+    return config["database"]
+
 class Database(ABC):
     def __init__(self):
         self.connection_url = self._build_url()
-
+        self.config = _get_database_config()
 
     @abstractmethod
     def _build_url(self) -> str:
