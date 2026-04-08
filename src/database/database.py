@@ -34,7 +34,7 @@ class Database(ABC):
 
 
     @abstractmethod
-    def _build_url(self) -> str: ...
+    def _build_url(self, database: str) -> str: ...
 
 
     def _create_engine(self) -> Engine:
