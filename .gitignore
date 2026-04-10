@@ -209,3 +209,5 @@ __marimo__/
 config.yml
 
 .cursor/
+
+*.DS_Store
