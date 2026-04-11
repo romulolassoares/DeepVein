@@ -29,6 +29,14 @@ def _get_database_config() -> Dict[str, Any]:
         )
     return raw
 
+
+def _query_snippet(query: str):
+    snippet = query.strip().replace("\n", " ")
+    if len(snippet) > _QUERY_SNIPPET_MAX:
+        snippet = snippet[:_QUERY_SNIPPET_MAX] + "..."
+    return snippet
+
+
 class Database(ABC):
     def __init__(self, database: str) -> None:
         self.config: Dict[str, Any] = _get_database_config()
@@ -63,9 +71,7 @@ class Database(ABC):
 
                 conn.commit()
         except SQLAlchemyError as e:
-            snippet = query.strip().replace("\n", " ")
-            if len(snippet) > _QUERY_SNIPPET_MAX:
-                snippet = snippet[:_QUERY_SNIPPET_MAX] + "…"
+            snippet = _query_snippet(query)
             raise DatabaseQueryError(
                 f"Query failed [sql: {snippet}]"
             ) from e
@@ -130,11 +136,10 @@ class Database(ABC):
 
                     conn.commit()
                 except SQLAlchemyError as e:
-                    snippet = query.strip().replace("\n", " ")
-                    if len(snippet) > _QUERY_SNIPPET_MAX:
-                        snippet = snippet[:_QUERY_SNIPPET_MAX] + "..."
+                    snippet = _query_snippet(query)
                     raise DatabaseQueryError(
                         f"Query failed [sql: {snippet}]"
                     ) from e
         finally:
             engine.dispose()
+
