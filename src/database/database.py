@@ -27,9 +27,9 @@ def _get_database_config() -> Dict[str, Any]:
     return raw
 
 class Database(ABC):
-    def __init__(self) -> None:
+    def __init__(self, database: str) -> None:
         self.config: Dict[str, Any] = _get_database_config()
-        self.connection_url = self._build_url()
+        self.connection_url = self._build_url(database)
         self._engine: Optional[Engine] = None
 
 
