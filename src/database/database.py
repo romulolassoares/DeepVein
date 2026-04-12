@@ -149,7 +149,7 @@ class Database(ABC):
             engine.dispose()
 
 
-    def extract_to_parquet(
+    def _extract_to_parquet_buffer(
         self,
         query: str,
         params: Optional[Dict[str, Any]] = None,
@@ -178,7 +178,7 @@ class Database(ABC):
         return path
 
 
-    def extract_to_parquet_stream(
+    def _extract_to_parquet_stream(
         self,
         query: str,
         params: Optional[Dict[str, Any]] = None,
@@ -216,3 +216,17 @@ class Database(ABC):
 
         return path
 
+
+    def extract_to_parquet(
+        self,
+        query: str,
+        params: Optional[Dict[str, Any]] = None,
+        output: str = 'parquet_file',
+        chunk_size: int = 1000,
+        stream: bool = False,
+    ) -> Path:
+        if stream:
+            return self._extract_to_parquet_stream(
+                query, params, output, chunk_size
+            )
+        return self._extract_to_parquet_buffer(query, params, output)
