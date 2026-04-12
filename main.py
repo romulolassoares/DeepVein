@@ -4,7 +4,11 @@ def main():
     kwargs = {"database": "rlass"}
     db = DatabaseFactory.build(engine="sqlserver", **kwargs)
 
-    result = db.execute_stream("SELECT * from tb_test_script", chunk_size=10000)
+    query = "SELECT * from tb_test_script"
+
+    # result = db.execute_stream(query, chunk_size=10000)
+
+    result = db.extract_to_parquet(query, output="script_test")
 
     print(result)
 
