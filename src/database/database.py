@@ -1,9 +1,10 @@
 from weakref import finalize
 import pyarrow as pa
+import pyarrow.parquet as pq
 
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Iterator, List, Mapping, Optional
-
+from pathlib import Path
 from sqlalchemy import Engine, text
 from sqlalchemy.engine import create_engine
 from sqlalchemy.exc import SQLAlchemyError
@@ -18,6 +19,10 @@ class DatabaseConfigurationError(RuntimeError):
 
 
 class DatabaseQueryError(RuntimeError):
+    pass
+
+
+class DatabaseExportError(RuntimeError):
     pass
 
 
@@ -143,3 +148,31 @@ class Database(ABC):
         finally:
             engine.dispose()
 
+
+    def extract_to_parquet(
+        self,
+        query: str,
+        params: Optional[Dict[str, Any]] = None,
+        output: str = 'parquet_file',
+    ) -> Path:
+        path = Path(output)
+        if path.suffix.lower() != ".parquet":
+            path = path.with_suffix(".parquet")
+
+        rows = self.execute(query, params)
+
+        try:
+            table = pa.Table.from_pylist(rows)
+        except pa.ArrowInvalid as e:
+            raise DatabaseExportError(
+                "Failed to convert query rows to Arrow table for Parquet export"
+            ) from e
+
+        try:
+            pq.write_table(table, path)
+        except OSError as e:
+            raise DatabaseExportError(
+                f"Failed to write Parquet file to {path}"
+            ) from e
+
+        return path
