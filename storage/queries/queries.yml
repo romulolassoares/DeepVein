@@ -1,0 +1,24 @@
+queries:
+  - id: example1
+    groups:
+      - group1
+      - group2
+      - group3
+    params:
+      param1: "PARAM 1"
+      param2: "PARAM 2"
+    sql: |
+      SELECT *
+      FROM table_001
+      WHERE param1 = '$param1'
+      AND param2 <> '$param2'
+  
+  - id: example2
+    groups:
+      - group1
+    params:
+      param1: "PARAM 1"
+    sql: |
+      SELECT *
+      FROM table_001
+      WHERE param1 = '$param1'
