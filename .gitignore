@@ -211,3 +211,5 @@ config.yml
 .cursor/
 
 *.DS_Store
+
+*.db
