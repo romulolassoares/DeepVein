@@ -36,7 +36,7 @@ def _get_database_config() -> Dict[str, Any]:
 
 
 def _query_snippet(query: str):
-    snippet = query.strip().replace("\n", " ")
+    snippet = str(query).strip().replace("\n", " ")
     if len(snippet) > _QUERY_SNIPPET_MAX:
         snippet = snippet[:_QUERY_SNIPPET_MAX] + "..."
     return snippet
