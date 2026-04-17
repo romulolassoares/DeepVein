@@ -24,6 +24,35 @@ class Store:
         self._conn.commit()
 
 
+    def insert(self, entry: Query) -> None:        
+        with self._conn as conn:
+            params = json.dumps(entry.params)
+            groups = "§".join(entry.groups)
+            conn.execute(
+                "INSERT OR REPLACE INTO queries (id, sql, params, groups) VALUES (?, ?, ?, ?)",
+                (entry.id, entry.sql, params, groups)
+            )
+
+    
+    def update(self, entry: Query) -> None:
+        with self._conn as conn:
+            params = json.dumps(entry.params)
+            groups = "§".join(entry.groups)
+            conn.execute(
+                "UPDATE queries SET sql = ?, params = ?, groups = ? WHERE id = ?",
+                (entry.sql, params, groups, entry.id)
+            )
+
+
+    def delete(self, query_id: str) -> bool:
+        with self._conn as conn:
+            result = conn.execute(
+                "DELETE FROM queries where id = ?",
+                (query_id,)
+            )
+        return result.rowcount > 0
+
+
     def close(self) -> None:
         self._conn.close()
     
