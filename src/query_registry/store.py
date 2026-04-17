@@ -53,6 +53,57 @@ class Store:
         return result.rowcount > 0
 
 
+    def get(self, query_id: str) -> Query:
+        with self._conn as conn:
+            result = conn.execute(
+                "SELECT id, sql, params, groups FROM queries WHERE id = ?",
+                (query_id,)
+            )
+            row = result.fetchone()
+        if row is None:
+            return None
+        return self._convert_to_query(row)
+
+
+    def get_by_group(self, group_name: str) -> List[Query]:
+        with self._conn as conn:
+            result = conn.execute(
+                """
+                SELECT id, sql, params, groups
+                FROM queries
+                WHERE groups LIKE ?
+                """,
+                (f"%{group_name}%",)
+            )
+        rows = result.fetchall()
+        return [self._convert_to_query(row) for row in rows]
+
+
+    def get_groups(self) -> List[str]:
+        with self._conn as conn:
+            result = conn.execute(
+                "SELECT DISTINCT groups FROM queries"
+            )
+        rows = result.fetchall()
+        distinct_values = {
+            value.strip()
+            for row in rows
+            for value in row[0].split("§")
+            if value.strip()
+        }
+        return sorted(distinct_values)
+
+    
+    def _convert_to_query(self, row: sqlite3.Row) -> Query:
+        query = Query(
+            id=row["id"],
+            sql=row["sql"],
+            params=json.loads(row["params"]),
+            groups=row["groups"].split("§")
+        )
+        return query
+        
+
     def close(self) -> None:
         self._conn.close()
     
