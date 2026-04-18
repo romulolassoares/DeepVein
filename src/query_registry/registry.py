@@ -10,7 +10,7 @@ class QueryRegistry:
 
     
     def add(self, entry: Query) -> None:
-        self._store.insert(entry)
+        self._store.upsert(entry)
 
     
     def get(self, query_id: str) -> Query:
@@ -23,7 +23,7 @@ class QueryRegistry:
 
 
     def update(self, entry: Query) -> None:
-        return self._store.update(entry)
+        return self._store.upsert(entry)
 
 
     def delete(self, query_id: str) -> bool:
