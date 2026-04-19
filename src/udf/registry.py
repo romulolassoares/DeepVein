@@ -32,7 +32,7 @@ def _get_python_files(path: Path) -> list[Path]:
 
     return [file for file in files if not file.stem.startswith("_")]
 
-def udf_loader(path: str | Path, database_path: str) -> None:
+def udf_loader(path: str | Path, database_path: str) -> DuckDB:
     root = Path(path)
     registered = {}
     try:
@@ -68,3 +68,4 @@ def udf_loader(path: str | Path, database_path: str) -> None:
                 raise RuntimeError(
                     f"Failed to register UDF {name!r} from {file}"
                 ) from e
+    return db
