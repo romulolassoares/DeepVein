@@ -24,9 +24,9 @@ class Runner:
         max_workers: int = 4
     ) -> None:
         if parallel:
-            return cls._parallel_runner(queries, database_path, max_workers)
+            return cls()._parallel_runner(queries, database_path, max_workers)
         
-        return cls._simple_runner(queries, database_path)
+        return cls()._simple_runner(queries, database_path)
 
 
     def _executor(self, query: Query, database_path: str) -> None:
