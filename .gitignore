@@ -213,3 +213,4 @@ config.yml
 *.DS_Store
 
 *.db
+*.duckdb
