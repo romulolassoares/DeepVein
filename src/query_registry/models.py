@@ -33,3 +33,9 @@ class Query:
             groups=data.get("groups", []),
             params=data.get("params", {}),
         )
+
+
+    def render(self) -> str:
+        sql = Template(self.sql)
+        sql = sql.safe_substitute(**self.params)
+        return str(sql)
