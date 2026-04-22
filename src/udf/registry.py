@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 import importlib.util
 import inspect
 import types
 from pathlib import Path
-from typing import List
+from typing import TYPE_CHECKING, List
 
-from src.database import DuckDB
+if TYPE_CHECKING:
+    from src.database.duckdb import DuckDB
 
 
 def _load_module_from_file(file: Path) -> types.ModuleType:
@@ -32,15 +35,9 @@ def _get_python_files(path: Path) -> list[Path]:
 
     return [file for file in files if not file.stem.startswith("_")]
 
-def udf_loader(path: str | Path, database_path: str) -> DuckDB:
+def udf_loader(path: str | Path, ddb: DuckDB) -> None:
     root = Path(path)
     registered = {}
-    try:
-        db = DuckDB(database=database_path)
-    except Exception as e:
-        raise RuntimeError(
-            f"Failed to open DuckDB database {database_path!r}"
-        ) from e
 
     py_files = _get_python_files(root)
 
@@ -59,7 +56,7 @@ def udf_loader(path: str | Path, database_path: str) -> DuckDB:
                 )
             
             try:
-                db.register_function(
+                ddb.register_function(
                     func_name=name,
                     func_impl=obj,
                 )
@@ -68,4 +65,3 @@ def udf_loader(path: str | Path, database_path: str) -> DuckDB:
                 raise RuntimeError(
                     f"Failed to register UDF {name!r} from {file}"
                 ) from e
-    return db
