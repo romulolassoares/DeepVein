@@ -2,9 +2,11 @@ import re
 from collections.abc import Callable, Sequence
 from typing import Any, List, Optional
 from src.utils import is_parquet_file, is_csv_file
+from src.udf import udf_loader
 
 import duckdb
 import polars as pl
+
 
 class DuckDB:
     def __init__(
@@ -14,6 +16,7 @@ class DuckDB:
     ) -> None:
         database = database or ":memory:"
         self.connection = duckdb.connect(database, read_only=read_only)
+        udf_loader("functions", self)
         
 
     def _insert_csv_data(self, table_name: str, filename: str) -> None:
@@ -69,9 +72,18 @@ class DuckDB:
 
 
     def register_function(self, func_name: str, func_impl: callable) -> None:
-        if self.function_exists(func_name):
+        try:
             self.connection.remove_function(func_name)
-        self.connection.create_function(func_name, func_impl)
+        except duckdb.InvalidInputException:
+            pass
+        try:
+            self.connection.create_function(func_name, func_impl)
+        except duckdb.CatalogException as e:
+            if "already exists" not in str(e).lower():
+                raise
+        except duckdb.NotImplementedException as e:
+            if "already created" not in str(e).lower():
+                raise
 
 
     def table_exists(self, table_name: str) -> bool:
