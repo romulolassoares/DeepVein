@@ -214,3 +214,5 @@ config.yml
 
 *.db
 *.duckdb
+*.log
+storage/tmp/*
