@@ -10,9 +10,13 @@ import polars as pl
 from src.database import DuckDB
 from src.query_registry import Query
 from src.query_runner import Runner
+from src.utils import get_logger, setup_logging
+
+logger = get_logger(__name__)
 
 
 def build_demo_database(database_path: str) -> None:
+    logger.info("Building demo database at '%s'", database_path)
     db = DuckDB(database=database_path, read_only=False)
 
     customers = pl.DataFrame(
@@ -34,9 +38,11 @@ def build_demo_database(database_path: str) -> None:
 
     db.insert_data("customers", customers)
     db.insert_data("orders", orders)
+    logger.info("Inserted demo tables: customers and orders")
 
 
 def build_demo_queries() -> list[Query]:
+    logger.info("Building demo query list")
     return [
         Query(
             id="q01_paid_orders_total",
@@ -77,13 +83,17 @@ def build_demo_queries() -> list[Query]:
 
 
 def print_query_results(database_path: str, queries: list[Query]) -> None:
+    logger.info("Printing query results from '%s'", database_path)
     db = DuckDB(database=database_path, read_only=True)
     for query in queries:
+        logger.info("Printing result for query '%s'", query.id)
         print(f"\n--- {query.id} ---")
         print(db.execute(query.render()).pl())
 
 
 def main() -> None:
+    setup_logging()
+    logger.info("Starting query runner demo")
     database_path = str(Path(__file__).with_name("query_runner_demo.duckdb"))
     queries = build_demo_queries()
 
@@ -95,9 +105,11 @@ def main() -> None:
         parallel=True,
         max_workers=4,
     )
+    logger.info("Runner execution completed")
 
     print_query_results(database_path, queries)
     print(f"\nDemo database created at: {database_path}")
+    logger.info("Query runner demo finished")
 
 
 if __name__ == "__main__":
