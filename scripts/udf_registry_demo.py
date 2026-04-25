@@ -9,12 +9,19 @@ import polars as pl
 
 from src.udf.registry import udf_loader
 from src.database import DuckDB
+from src.utils import get_logger, setup_logging
+
+logger = get_logger(__name__)
 
 def main() -> None:
+    setup_logging()
+    logger.info("Starting UDF registry demo")
     database_path = str(Path(__file__).with_name("udf_registry_demo.duckdb"))
     functions_dir = PROJECT_ROOT / "functions"
+    logger.info("Using functions directory '%s'", functions_dir)
 
     db = udf_loader(functions_dir, database_path)
+    logger.info("UDF loader completed")
 
     items = pl.DataFrame(
         {
@@ -25,9 +32,11 @@ def main() -> None:
         }
     )
     db.insert_data("items", items)
+    logger.info("Inserted demo items table")
 
     print("Registered UDFs from", functions_dir)
     print("\n--- plus(base_qty, extra_qty) ---")
+    logger.info("Running plus() demo query")
     print(
         db.execute(
             """
@@ -41,6 +50,7 @@ def main() -> None:
     )
 
     print("\n--- isnull(note, '(no note)') ---")
+    logger.info("Running isnull() demo query")
     print(
         db.execute(
             """
@@ -57,6 +67,7 @@ def main() -> None:
     )
 
     print(f"\nDatabase file: {database_path}")
+    logger.info("UDF registry demo finished")
 
 
 if __name__ == "__main__":
